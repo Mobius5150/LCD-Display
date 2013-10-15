@@ -1,0 +1,8 @@
+# Compiled source #
+###################
+*.dat
+*.gci
+*.dll
+*.exe
+*.o
+*.so

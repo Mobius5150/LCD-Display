@@ -1,0 +1,849 @@
+#platform "uLCD-43PT"
+// Cameron Horvath (Jan. 15, 2013)
+
+#inherit "4DGL_16bitColours.fnc"
+#inherit "VisualConst.inc"
+#inherit "EcoCarMainConst.inc"
+#inherit "ledDigitsDisplay.inc"
+
+var combuf[3];
+var tmpbuf[3];
+var n, ch;
+
+
+#CONST
+    PIN_LCDOUT   1
+    PIN_PICIN   2
+    PIN_CALIBRATE 3
+#END
+
+var cycle := 0; // Indicates save cycles for odometer. Don't want to save on the uSD card too quickly.
+var activeForm := 1;    // Indicates which form we currently have active.
+
+// Form1 Quantities:
+var speed := 0;
+var trip := 0;   // Low-precision (displayed) values.
+var odo := 0;
+var odo_micro := 0; // High-precision values used in distance calcs.
+var trip_micro := 0;
+var cruise := 0;//0xFFFF;
+var direction := 0;//0x0000;
+
+// Form2 Quantities:
+var temp_outside := 0;//40;
+var temp_cabin := 0;//20 + 30;
+var temp_trunk := 0;//20 + 30;
+var temp_fuelcell := 0;//0x6A;
+
+// Form3 Quantities:
+var vstack := 0;//0x74;
+var vaccessory := 0;//121;
+var bbvoltage := 0;//482;
+var istack := 0;//0x0044;
+var motcurr1 := 0;//0x00;
+var motcurr2 := 0;//0x00;
+var pwrFuelCell := 0;//0xFFFF;
+var pwrMotor := 0;
+var backupVal := 0;
+
+// Form4 Quantities:
+var ptank := 0;//0x07EE;
+
+var lastTimeout := 0;
+
+func reset_trip()
+    // Reset trip odometer.
+    trip_micro := 0;
+    trip := 0;
+
+    // Redraw trip timer.
+    img_Show(hndl, idig_trip);
+    if(activeForm == 1)
+        ledDigitsDisplay(trip, idig_trip+1, 344, 4, 2, 16, 0) ;
+    endif
+    var hFile;
+    // Clear odometer file on uSD
+    if(file_Exists("TRIP.TXT"))
+        file_Erase("TRIP.TXT");   // Get rid of the old data.
+    endif
+
+endfunc
+
+func update_odo()
+        var time_elapsed, inc;
+        time_elapsed := peekW(SYSTEM_TIMER_LO); // Read from system timer.
+        inc := time_elapsed/10*speed/36;
+        //txt_MoveCursor(1,1);
+        //print("inc: ", [DEC] inc,"             \n");
+
+        // odo contains data to nearest kilometre.
+        // odo_micro has sub-kilometre data (accurate to nearest 10 cm)
+        if(inc > 0)
+            odo_micro := odo_micro + inc;
+            trip_micro := trip_micro + inc;
+        endif
+
+        odo := odo + odo_micro / 10000; // If there's an extra kilometer, throw it onto odo.
+        trip := trip + trip_micro / 1000; // If there's an extra 1/10th of kilometer, throw it onto odo.
+
+        if(odo_micro > 10000)
+            if(activeForm == 1)
+                ledDigitsDisplay(odo, idig_odo+1, 72, 4, 1, 16, 0) ;
+            endif
+
+            // Save odometer data to uSD
+            var hFile;
+            if(file_Exists("ODO.TXT"))
+                file_Erase("ODO.TXT");   // Get rid of the old data.
+            endif
+
+            if(hFile := file_Open("ODO.TXT" ,'w'))
+                file_PutW(odo, hFile);   // Write the new odometer data to uSD.
+                file_Close(hFile);
+            endif
+        endif
+
+        if(trip_micro > 1000)
+            if(activeForm == 1)
+                ledDigitsDisplay(trip, idig_trip+1, 344, 4, 2, 16, 0) ;
+            endif
+
+            // Save odometer data to uSD
+            if(file_Exists("TRIP.TXT"))
+                file_Erase("TRIP.TXT");   // Get rid of the old data.
+            endif
+
+            if(hFile := file_Open("TRIP.TXT" ,'w'))
+                file_PutW(trip, hFile);   // Write the new odometer data to uSD.
+                file_Close(hFile);
+            endif
+        endif
+
+        odo_micro := odo_micro % 10000;       // Take the remainder and keep it in odo_micro
+        trip_micro := trip_micro % 1000;       // Take the remainder and keep it in trip_micro
+        cycle++;
+        if((cycle % 10 == 0) && inc > 0)
+            if(file_Exists("ODOM.TXT"))
+                file_Erase("ODOM.TXT");   // Get rid of the old data.
+            endif
+
+            if(hFile := file_Open("ODOM.TXT" ,'w'))
+                file_PutW(odo_micro, hFile);   // Write the new odometer data to uSD.
+                file_Close(hFile);
+            endif
+            cycle := 0;
+        endif
+
+        // Save new speed data.
+        sys_SetTimer(TIMER1, 1000);
+        pokeW(SYSTEM_TIMER_LO, 0);  // Reset speed timer.
+
+    endfunc
+
+
+
+func process_serial_data(var type, var databyte1, var databyte2)
+    var dataword := 0;
+    dataword := databyte1<<8 | (databyte2 & 0x00FF);
+    // Process the data received on the serial port.
+
+    if(type == 0xA0)
+        if(activeForm == 3 && pwrFuelCell != databyte2)
+            img_SetWord(hndl, iledFuelCellPwr, IMAGE_INDEX, databyte2 && 0x01) ;      // where numx is 0 (Off) or 1 (On)
+            img_Show(hndl,iledFuelCellPwr) ;
+        endif
+        pwrFuelCell := databyte2;
+    else if(type == 0xA1)
+        // Fuel cell temperature
+        if(activeForm == 2 && temp_fuelcell != databyte2)
+            // Top end is 70 deg. C
+            img_SetWord(hndl, itemp_fuelcell, IMAGE_INDEX, databyte2/2);
+            img_Show(hndl, itemp_fuelcell);
+        endif
+
+        temp_fuelcell := databyte2;
+    else if(type == 0xA2)
+        // Not being displayed.
+    else if(type == 0xA3)
+        // Fuel cell current (top end 20A)
+       if(activeForm == 3 && istack != databyte2)
+            ledDigitsDisplay(databyte2*2, idigStackI+1, 160, 3, 2, 16, 0) ;
+            img_SetWord(hndl, ibarStackI, IMAGE_INDEX, databyte2*2/5) ;
+            img_Show(hndl, ibarStackI) ;
+        endif
+
+        if(istack > 0x00 && databyte2 == 0x00 && speed >= 7)
+            dispErrorMsg(5, 0xD1, 1); // Fuel cell abrupt shutoff.
+        endif
+
+        istack := databyte2;
+    else if(type == 0xA4)
+        if(activeForm == 3 && vstack != databyte2)
+            ledDigitsDisplay(databyte2*10/3, idigStackV+1, 160, 3, 2, 16, 0) ;
+            img_SetWord(hndl, ibarStackV, IMAGE_INDEX, databyte2*2/3) ;
+            img_Show(hndl, ibarStackV) ;
+        endif
+        vstack := databyte2;
+    else if(type == 0xB0)
+        // Buck-boost voltage
+        if(activeForm == 3 && bbvoltage != dataword)
+            ledDigitsDisplay(dataword/10, idigBuckBoostV+1, 160, 3, 2, 16, 0);
+            img_SetWord(hndl, ibarBuckBoostV, IMAGE_INDEX, dataword/6) ;
+            img_Show(hndl, ibarBuckBoostV) ;
+        endif
+        bbvoltage := dataword;
+    else if(type == 0xB1)
+        // Motor pwr LED
+        if(activeForm == 3 && pwrMotor != databyte2)
+            img_SetWord(hndl, iledMotorPwr, IMAGE_INDEX, databyte2 && 0x01) ;      // where numx is 0 (Off) or 1 (On)
+            img_Show(hndl,iledMotorPwr) ;
+        endif
+        pwrMotor := databyte2;
+     else if(type == 0xB2)
+        // Motor current 1
+        if(activeForm == 3 && motcurr1 != dataword)
+            ledDigitsDisplay(dataword/10, idigMotCurr1+1, 160, 3, 2, 16, 0);
+            img_SetWord(hndl, ibarMotCurr1, IMAGE_INDEX, dataword*2) ;
+            img_Show(hndl, ibarMotCurr1) ;
+        endif
+        motcurr1 := dataword;
+     else if(type == 0xB3)
+        // Motor current 2
+        if(activeForm == 3 && motcurr2 != dataword)
+            ledDigitsDisplay(dataword/10, idigMotCurr2+1, 160, 3, 2, 16, 0);
+            img_SetWord(hndl, ibarMotCurr2, IMAGE_INDEX, dataword*2) ;
+            img_Show(hndl, ibarMotCurr2) ;
+        endif
+        motcurr2 := dataword;
+    else if(type == 0xB4)
+        // Speed data:
+        if(databyte2 != speed)
+            speed := databyte2;
+            if(activeForm == 1)
+                // Redraw the speed and the bar on the main form.
+                ledDigitsDisplay2(speed, idig_speed+1, 76, 2, 1, 100, 1, 1) ;
+
+                img_SetWord(hndl, igauge_speed, IMAGE_INDEX, speed*100/60) ; // where frame is 0 to 100 (for a displayed 0 to 100)
+                img_Show(hndl,igauge_speed) ;
+
+            endif
+        endif
+     else if(type == 0xB5)
+        // Direction
+        if(activeForm == 1 && direction != databyte2)
+            if(databyte2 & 0x01 == 0x01)
+                gfx_RectangleFilled(8, 40, 61, 150, 0x0000) ;
+                img_Show(hndl,iImage6) ;
+            else
+                gfx_RectangleFilled(8, 40, 61, 150, 0x0000) ;
+                img_Show(hndl,iImage5);
+            endif
+        endif
+        direction := databyte2;
+     else if(type == 0xB6)
+        // Cruise control
+        if(activeForm == 1 && cruise != databyte2)
+            if(databyte2 & 0x01 == 0x01)
+                img_Enable(hndl,iImage7) ;
+                img_Show(hndl,iImage7) ;
+            else
+                img_Disable(hndl,iImage7) ;
+                gfx_RectangleFilled(6, 151, 59, 201, BLACK) ;
+            endif
+        endif
+        cruise := databyte2;
+     else if(type == 0xC0)
+        // Trunk temperature
+        if(activeForm == 2 && temp_trunk != databyte2)
+            img_SetWord(hndl, itemp_trunk, IMAGE_INDEX, databyte2);
+            img_Show(hndl, itemp_trunk);
+        endif
+        temp_trunk := databyte2;
+     else if(type == 0xC1)
+        // Cabin temperature
+        if(activeForm == 2 && temp_cabin != databyte2)
+            img_SetWord(hndl, itemp_cabin, IMAGE_INDEX, databyte2);
+            img_Show(hndl, itemp_cabin);
+        endif
+        temp_cabin := databyte2;
+     else if(type == 0xC2)
+        // Outside temperature
+        if(activeForm == 2 && temp_outside != databyte2)
+            img_SetWord(hndl, itemp_outside, IMAGE_INDEX, databyte2/2 + 30);
+            img_Show(hndl, itemp_outside);
+        endif
+        temp_outside := databyte2;
+     else if(type == 0xC3)
+         //print([HEX] dataword);
+        // accessory battery voltage
+        if(activeForm == 3 && vaccessory != dataword)
+
+            ledDigitsDisplay(dataword, idigAccV+1, 160, 3, 2, 16, 0) ;
+            img_SetWord(hndl, ibarAccV, IMAGE_INDEX, dataword*2/3) ;
+            img_Show(hndl, ibarAccV) ;
+        endif
+        vaccessory := dataword;
+     else if(type == 0xC4)
+        // backup alarm
+        if(0)//backupVal != dataword)
+            backupVal := dataword;
+            if(backupVal >= 325)
+                sys_SetTimer(TIMER2, 0);
+            else
+                sys_SetTimer(TIMER2, 1);
+            endif
+        endif
+    else if(type == 0xF0)
+        //if(databyte2 != lastTimeout)
+        //    dispErrorMsg(databyte1, databyte2, 0);
+        //endif
+        lastTimeout := databyte2;
+    endif
+
+endfunc
+
+func setBackupAlarm()
+if(activeForm != 1)
+draw_form1();
+else
+clearErrors();
+endif
+    snd_Volume(127);
+    if(direction == 0xFF)
+        if(backupVal < 325)
+                 txt_Set(TEXT_COLOUR, RED);
+              txt_MoveCursor(20,6);
+                print("WARNING: Obstruction behind vehicle!");
+                 txt_MoveCursor(21,6);
+                 print("Check clearance before backing up.");
+        endif
+        // We are going in reverse. Detect our distance.
+        if(backupVal < 72) // 0.3m
+            if(!snd_Playing())
+                file_PlayWAV("backup3.wav");
+            endif
+            sys_SetTimer(TIMER2, 200);
+        else if(backupVal < 250) // 1.3m
+            if(!snd_Playing())
+                file_PlayWAV("backup2.wav");
+            endif
+            sys_SetTimer(TIMER2, 200);
+        else if(backupVal < 325) // 1.3m
+            if(!snd_Playing())
+                file_PlayWAV("backup1.wav");
+            endif
+            sys_SetTimer(TIMER2, 200);
+        else if(backupVal >= 325)
+             sys_SetTimer(TIMER2, 0);
+        endif
+
+
+
+    endif
+
+endfunc
+
+func dispErrorMsg(var databyte1, var databyte2, var alarm)
+if(activeForm != 1)
+draw_form1();
+else
+clearErrors();
+endif
+        txt_MoveCursor(20,6);
+        txt_Set(TEXT_COLOUR, RED);
+            if(activeForm == 1 && databyte2 != lastTimeout && databyte1 == 2)
+                // Fuel cell slave not responding.
+                 print("ERROR: Comm timeout with FCell sensor board! (", [HEX] databyte2, ")");
+                 txt_MoveCursor(21,6);
+                 print("Please check connections and reset system.");
+            else if(activeForm == 1 && activeForm == 1 && databyte2 != lastTimeout && databyte1 == 1)
+                // Fuel cell slave not responding.
+
+                 print("ERROR: Comm timeout with master node! (", [HEX] databyte2, ")");
+                 txt_MoveCursor(21,6);
+                 print("Please check connections and code timing.");
+            else if(activeForm == 1 && databyte2 != lastTimeout && databyte1 == 3)
+                 // Motors slave not responding.
+
+                 print("ERROR: Comm timeout with Motor sensor board! (", [HEX] databyte2, ")");
+                 txt_MoveCursor(21,6);
+                 print("Please check connections and reset system.");
+            else if(activeForm == 1 && databyte2 != lastTimeout && databyte1 == 4)
+                 // Misc. slave not responding.
+
+                 print("ERROR: Comm timeout with Misc. sensor board! (", [HEX] databyte2, ")");
+                 txt_MoveCursor(21,6);
+                 print("Please check connections and reset system.");
+            else if(activeForm == 1 && databyte2 != lastTimeout && databyte1 == 5)
+                // We're saving "5" as a special case of error.
+                if(databyte2 == 0xD1)
+                    // Fuel cell abruptly died.
+                 print("WARNING: Fuel cell shutoff detected!");
+                 txt_MoveCursor(21,6);
+                 print("Release accelerator and cruise as far as you can?");
+                endif
+
+            endif
+            if(alarm)
+                play_alarm();
+            endif
+endfunc
+
+func clearErrors()
+    txt_MoveCursor(20,6);
+    print("                                                   ");
+    txt_MoveCursor(21,6);
+    print("                                                 ");
+
+    if(lastTimeout > 0xD0)
+    lastTimeout := 0x00; // Clear any critical errors so they can come up again.
+    endif
+
+endfunc
+
+func serial_read()
+start_serial:
+    com_Init(combuf, 3, 0xFF );
+    pin_HI(PIN_LCDOUT); // Signal to PIC that we are listening
+
+    setbaud(BAUD_57600);
+
+    repeat
+    until(com_Full());
+
+    n := com_Count();
+    while(n--)
+        if( (ch := serin()) < -1)
+            print([DEC] ch);
+            com_Reset();
+            goto start_serial;
+        else if(ch == -1)
+             print([DEC] ch);
+        endif
+        tmpbuf[2-n] := ch;
+    wend
+
+    pin_LO(PIN_LCDOUT); // No longer listening.
+
+
+    com_Reset();
+
+    // Process data.
+    process_serial_data(tmpbuf[0], tmpbuf[1], tmpbuf[2]);
+
+    // Check for touch events.
+    checkTouchEvents();
+
+    // Check the status of the PIC pin. Either keep listening, or
+    // draw the form and return back to the main routine.
+
+    if (pin_Read(PIN_PICIN))
+        //goto start_serial;
+    endif
+
+endfunc
+
+func draw_form4()
+    gfx_Cls();
+
+
+    // Form4 1.0 generated 2/8/2013 11:11:51 PM
+
+    // Statictext20 1.0 generated 2/8/2013 11:11:51 PM
+    img_Show(hndl,iStatictext20) ;
+
+    // Angularmeter1 1.0 generated 2/8/2013 11:11:51 PM
+    img_SetWord(hndl, iAngularmeter1, IMAGE_INDEX, ptank) ; // where frame is 0 to 2200 (for a displayed 0 to 2200)
+    img_Show(hndl,iAngularmeter1) ;
+
+    // Statictext21 1.0 generated 2/8/2013 11:11:51 PM
+    img_Show(hndl,iStatictext21) ;
+
+    // Button6 1.0 generated 2/8/2013 11:11:51 PM
+    gfx_Button(1, 372, 236, RED, YELLOW, FONT1, 2, 2, "< Back") ;
+
+    activeForm := 4;
+endfunc
+
+func draw_form1()
+
+    gfx_Cls();
+
+
+    if(direction & 0x01 == 0x01)
+        gfx_RectangleFilled(8, 40, 61, 150, 0x0000) ;
+        img_Show(hndl,iImage6) ;
+    else
+        gfx_RectangleFilled(8, 40, 61, 150, 0x0000) ;
+        img_Show(hndl,iImage5);
+    endif
+
+    if(cruise & 0x01 == 0x01)
+        img_Enable(hndl,iImage7) ;
+        img_Show(hndl,iImage7) ;
+    else
+        img_Disable(hndl,iImage7) ;
+        gfx_RectangleFilled(6, 151, 59, 201, BLACK) ;
+    endif
+
+    // dig_speed 1.0 generated 1/13/2013 11:35:34 PM
+    img_Show(hndl, idig_speed);  // show all digits at 0, only do this once
+    ledDigitsDisplay(speed, idig_speed+1, 76, 2, 1, 100, 1) ;
+
+    // Statictext2 1.0 generated 1/13/2013 11:35:34 PM
+    img_Show(hndl,iStatictext2) ;
+
+    // Image8 1.0 generated 3/4/2013 6:33:40 PM
+    img_Show(hndl,iImage8) ;
+
+    // Line1 1.0 generated 1/13/2013 11:35:34 PM
+    gfx_Line(0, 236, 512, 236, SPRINGGREEN) ;
+
+    // Button1 1.0 generated 1/13/2013 11:35:35 PM
+    gfx_Button(1, 392, 60, RED, YELLOW, FONT1, 2, 2, "Fuel") ;
+
+    // Button2 1.0 generated 1/13/2013 11:35:35 PM
+    gfx_Button(1, 384, 188, RED, YELLOW, FONT1, 2, 2, "Temp.") ;
+
+    // Line2 1.0 generated 1/13/2013 11:35:35 PM
+    gfx_Line(0, 30, 512, 30, SPRINGGREEN) ;
+
+    // Button3 1.0 generated 1/13/2013 11:35:35 PM
+    gfx_Button(1, 380, 124, RED, YELLOW, FONT1, 2, 2, "Power") ;
+
+    // Line3 1.0 generated 1/13/2013 11:35:35 PM
+    gfx_Line(340, 30, 340, 236, SPRINGGREEN) ;
+
+    // Statictext3 1.0 generated 1/13/2013 11:35:35 PM
+    img_Show(hndl,iStatictext3) ;
+
+    // dig_trip 1.0 generated 1/13/2013 11:35:35 PM
+    img_Show(hndl, idig_trip);  // show all digits at 0, only do this once
+    ledDigitsDisplay(trip, idig_trip+1, 344, 4, 2, 16, 0) ;
+
+    // Statictext4 1.0 generated 1/13/2013 11:35:36 PM
+    img_Show(hndl,iStatictext4) ;
+
+    // Image1 1.0 generated 1/13/2013 11:35:36 PM
+    img_Show(hndl,iImage1) ;
+
+    // Statictext5 1.0 generated 1/13/2013 11:35:36 PM
+    img_Show(hndl,iStatictext5) ;
+
+    // Statictext6 1.0 generated 1/13/2013 11:35:36 PM
+    img_Show(hndl,iStatictext6) ;
+
+    // gauge_speed 1.0 generated 1/13/2013 11:35:36 PM
+    img_SetWord(hndl, igauge_speed, IMAGE_INDEX, speed*100/60) ; // where frame is 0 to 100 (for a displayed 0 to 100)
+    img_Show(hndl,igauge_speed) ;
+
+    // dig_odo 1.0 generated 1/13/2013 11:35:36 PM
+    img_Show(hndl, idig_odo);  // show all digits at 0, only do this once
+    ledDigitsDisplay(odo, idig_odo+1, 72, 4, 1, 16, 0) ;
+
+    // Image2 1.0 generated 1/13/2013 11:35:37 PM
+    img_Show(hndl,iImage2) ;
+
+    // Image3 1.0 generated 1/13/2013 11:35:37 PM
+    img_Show(hndl,iImage3) ;
+
+    // Image4 1.0 generated 1/13/2013 11:35:37 PM
+    img_Show(hndl,iImage4) ;
+    activeForm := 1;
+endfunc
+
+func draw_form3()
+    gfx_Cls();
+
+    // Statictext7 1.0 generated 2/10/2013 12:59:33 PM
+    img_Show(hndl,iStatictext7) ;
+
+    // Button5 1.0 generated 2/10/2013 12:59:33 PM
+    gfx_Button(1, 372, 236, RED, YELLOW, FONT1, 2, 2, "< Back") ;
+
+    // barStackV 1.0 generated 2/10/2013 12:59:33 PM
+    img_SetWord(hndl, ibarStackV, IMAGE_INDEX, vstack*2/3) ; // where frame is 0 to 100 (for a displayed 0 to 100)
+    img_Show(hndl,ibarStackV) ;
+
+    // Statictext8 1.0 generated 2/10/2013 12:59:33 PM
+    img_Show(hndl,iStatictext8) ;
+
+    // digStackV 1.0 generated 2/10/2013 12:59:33 PM
+    img_Show(hndl, idigStackV);  // show all digits at 0, only do this once
+    ledDigitsDisplay(vstack*10/3, idigStackV+1, 160, 3, 2, 16, 0) ;
+
+    // Statictext9 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iStatictext9) ;
+
+    // Statictext10 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iStatictext10) ;
+
+    // Statictext11 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iStatictext11) ;
+
+    // Statictext12 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iStatictext12) ;
+
+    // Statictext13 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iStatictext13) ;
+
+    // Statictext16 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iStatictext16) ;
+
+    // barAccV 1.0 generated 2/10/2013 12:59:34 PM
+    img_SetWord(hndl, ibarAccV, IMAGE_INDEX, vaccessory*2/3) ; // where frame is 0 to 100 (for a displayed 0 to 100)
+    img_Show(hndl,ibarAccV) ;
+
+    // ledFuelCellPwr 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iledFuelCellPwr) ;  // show initialy, if required
+    img_SetWord(hndl, iledFuelCellPwr, IMAGE_INDEX, pwrFuelCell && 0x01) ;      // where numx is 0 (Off) or 1 (On)
+    img_Show(hndl,iledFuelCellPwr) ;
+
+    // ledMotorPwr 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iledMotorPwr) ;  // show initialy, if required
+    img_SetWord(hndl, iledMotorPwr, IMAGE_INDEX, pwrMotor) ;      // where numx is 0 (Off) or 1 (On)
+    img_Show(hndl,iledMotorPwr) ;
+
+    // digAccV 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl, idigAccV);  // show all digits at 0, only do this once
+    ledDigitsDisplay(vaccessory, idigAccV+1, 160, 3, 2, 16, 0) ;
+
+    // Statictext14 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl,iStatictext14) ;
+
+    // digBuckBoostV 1.0 generated 2/10/2013 12:59:34 PM
+    img_Show(hndl, idigBuckBoostV);  // show all digits at 0, only do this once
+    ledDigitsDisplay(bbvoltage, idigBuckBoostV+1, 160, 3, 2, 16, 0) ;
+
+    // digStackI 1.0 generated 2/10/2013 12:59:35 PM
+    img_Show(hndl, idigStackI);  // show all digits at 0, only do this once
+    ledDigitsDisplay(istack*2, idigStackI+1, 160, 3, 2, 16, 0) ;
+
+    // digMotCurr1 1.0 generated 2/10/2013 12:59:35 PM
+    img_Show(hndl, idigMotCurr1);  // show all digits at 0, only do this once
+    ledDigitsDisplay(motcurr1, idigMotCurr1+1, 160, 3, 2, 16, 0) ;
+
+    // digMotCurr2 1.0 generated 2/10/2013 12:59:35 PM
+    img_Show(hndl, idigMotCurr2);  // show all digits at 0, only do this once
+    ledDigitsDisplay(motcurr2, idigMotCurr2+1, 160, 3, 2, 16, 0) ;
+
+    // Statictext15 1.0 generated 2/10/2013 12:59:35 PM
+    img_Show(hndl,iStatictext15) ;
+
+    // Statictext17 1.0 generated 2/10/2013 12:59:35 PM
+    img_Show(hndl,iStatictext17) ;
+
+    // Statictext18 1.0 generated 2/10/2013 12:59:35 PM
+    img_Show(hndl,iStatictext18) ;
+
+    // Statictext19 1.0 generated 2/10/2013 12:59:35 PM
+    img_Show(hndl,iStatictext19) ;
+
+    // barBuckBoostV 1.0 generated 2/10/2013 12:59:35 PM
+    img_SetWord(hndl, ibarBuckBoostV, IMAGE_INDEX, bbvoltage/6) ; // where frame is 0 to 100 (for a displayed 0 to 100)
+    img_Show(hndl,ibarBuckBoostV) ;
+
+    // barStackI 1.0 generated 2/10/2013 12:59:35 PM
+    img_SetWord(hndl, ibarStackI, IMAGE_INDEX, istack*2/5) ; // where frame is 0 to 100 (for a displayed 0 to 100)
+    img_Show(hndl,ibarStackI) ;
+
+    // barMotCurr1 1.0 generated 2/10/2013 12:59:35 PM
+    img_SetWord(hndl, ibarMotCurr1, IMAGE_INDEX, 0) ; // where frame is 0 to 100 (for a displayed 0 to 100)
+    img_Show(hndl,ibarMotCurr1) ;
+
+    // barMotCurr2 1.0 generated 2/10/2013 12:59:35 PM
+    img_SetWord(hndl, ibarMotCurr2, IMAGE_INDEX, 0) ; // where frame is 0 to 100 (for a displayed 0 to 100)
+    img_Show(hndl,ibarMotCurr2) ;
+
+     activeForm := 3;
+endfunc
+
+func draw_form2()
+
+    gfx_Cls();
+
+    // temp_outside 1.0 generated 1/15/2013 12:53:55 AM
+    img_SetWord(hndl, itemp_outside, IMAGE_INDEX, temp_outside/2 + 30) ; // where frame is 0 to 70 (for a displayed -1 to -1)
+    img_Show(hndl,itemp_outside) ;
+
+    // Button4 1.0 generated 1/15/2013 12:53:56 AM
+    gfx_Button(1, 372, 236, RED, YELLOW, FONT1, 2, 2, "< Back");
+
+    // temp_cabin 1.0 generated 1/15/2013 12:53:56 AM
+    img_SetWord(hndl, itemp_cabin, IMAGE_INDEX, temp_cabin) ; // where frame is 0 to 70 (for a displayed -1 to -1)
+    img_Show(hndl,itemp_cabin) ;
+
+    // temp_trunk 1.0 generated 1/15/2013 12:53:56 AM
+    img_SetWord(hndl, itemp_trunk, IMAGE_INDEX, temp_trunk) ; // where frame is 0 to 70 (for a displayed -1 to -1)
+    img_Show(hndl,itemp_trunk) ;
+
+    // temp_fuelcell 1.0 generated 1/15/2013 12:53:56 AM
+    img_SetWord(hndl, itemp_fuelcell, IMAGE_INDEX, temp_fuelcell/2) ; // where frame is 0 to 70 (for a displayed -1 to -1)
+    img_Show(hndl,itemp_fuelcell) ;
+
+    // Statictext1 1.0 generated 1/15/2013 12:53:56 AM
+    img_Show(hndl,iStatictext1) ;
+
+     activeForm := 2;
+
+endfunc
+
+
+func main()
+    pin_Set(OUTPUT, PIN_LCDOUT);     // Set pin to output for LCD_readReady
+    pin_Set(INPUT, PIN_PICIN);       // Set pin to input for PIC_hasNewData
+    pin_Set(INPUT, PIN_CALIBRATE);  // Pin used to enter display into emergency calibration/debug mode.
+
+    pin_LO(PIN_LCDOUT);
+
+    if(pin_Read(PIN_CALIBRATE))
+        file_Run("43TouchCal.4XE", 0);  // Run the emergency calibration program.
+    endif
+
+    // Step 1: Mount the uSD file system:
+    putstr("Please wait. Mounting uSD File System....\n");
+    if (!(disk:=file_Mount()))
+        while(!(disk := file_Mount()))
+            putstr("Drive not mounted... Please insert uSD card!");
+            pause(200);
+            gfx_Cls();
+            pause(200);
+        wend
+    endif
+
+    hndl := file_LoadImageControl("ECOCAR~1.dat", "ECOCAR~1.gci", 1);
+
+    if (!hndl)
+        putstr("Failed to read image data from uSD!");
+        repeat forever
+    endif
+
+    gfx_Cls();
+    touch_Set(TOUCH_ENABLE); // Enable touch screen.
+    gfx_TransparentColour(0x0020);
+    gfx_Transparency(ON);
+    gfx_Set(SCREEN_MODE, LANDSCAPE) ;    // Set screen to landscape mode.
+
+    var hFile;
+    if(hFile := file_Open("ODO.TXT" ,'r'))
+        odo := file_GetW(hFile);    // Retrieve odometer value.
+        file_Close(hFile);
+    endif
+
+    if(hFile := file_Open("ODOM.TXT" ,'r'))
+        odo_micro := file_GetW(hFile);    // Retrieve odometer small-scale value.
+        file_Close(hFile);
+    endif
+
+    if(hFile := file_Open("TRIP.TXT" ,'r'))
+        trip := file_GetW(hFile);    // Retrieve trip odo small-scale value.
+        file_Close(hFile);
+    endif
+
+    draw_form1();
+
+    sys_SetTimerEvent(TIMER1, update_odo);
+    sys_SetTimerEvent(TIMER2, setBackupAlarm);
+    pokeW(SYSTEM_TIMER_LO, 0);
+    sys_SetTimer(TIMER1, 10);
+
+
+
+    if(snd_Playing())
+        snd_Stop();
+    endif
+
+     repeat
+        if(pin_Read(PIN_PICIN))
+            serial_read();
+        endif
+
+        checkTouchEvents();
+    forever
+
+endfunc
+
+func checkTouchEvents()
+if(touch_Get(TOUCH_STATUS) == TOUCH_PRESSED)
+            // Query the x and y coordinates of where we touched.
+            var x;
+            var y;
+            x := touch_Get(TOUCH_GETX);
+            y := touch_Get(TOUCH_GETY);
+            if(x >= 342 && activeForm == 1 && y > 40 && y < 225 && activeForm == 1)
+                // Main menu options:
+                if(y < 100)
+                    draw_form4();
+                else if(y > 120 && y < 180)
+                    draw_form3();
+                else if(y > 180)
+                    draw_form2();
+                endif
+            else if(y <=35 && x >= 435 && activeForm == 1)
+                 reset_trip();
+            else if(activeForm != 1 && y > 200 && x >=350)
+                draw_form1();
+            else if(activeForm == 1 && y < 255 && y > 230 && x > 1 && x < 60)
+                 play_sax_man();
+            else
+                snd_Stop();
+                if(activeForm == 1)
+                    clearErrors();
+                endif
+            endif
+endif
+endfunc
+
+// Credits to Howard (http://www.4d.websitetoolbox.com/post?id=6069444&goto=nextnewest)
+func ledDigitsDisplay2(var newval, var index, var left, var Digits, var MinDigits, var WidthDigit, var LeadingBlanks, var FastMode)
+    var private digitstate[6];
+    var i, k, l, lb ;
+    l := 1 ;
+    for (i := 1; i < Digits; i++)
+        l *= 10 ;
+    next
+    lb := LeadingBlanks ;
+    for (i := 0; i < Digits; i++)
+        k := newval / l ;
+        newval -= k * l ;
+        if ( lb && (i < Digits - MinDigits) )
+            if (k == 0)
+                k := -1 ;
+            else
+                lb := 0 ;
+            endif
+        endif
+        l /= 10 ;
+        if(FastMode)
+            if(digitstate[i] != k)
+                img_SetWord(hndl, index, IMAGE_INDEX, k);
+                img_SetWord(hndl, index, IMAGE_XPOS, left+i*WidthDigit) ;
+                img_Show(hndl, index);
+            endif
+        else
+            img_SetWord(hndl, index, IMAGE_INDEX, k);
+            img_SetWord(hndl, index, IMAGE_XPOS, left+i*WidthDigit) ;
+            img_Show(hndl, index);
+        endif
+       digitstate[i] := k;
+    next
+endfunc
+
+func play_alarm()
+    var r;
+    snd_Stop(); // Stop anything currently playing.
+    r := file_PlayWAV("Alarm.wav");
+    snd_Volume(127);
+
+endfunc
+
+func play_sax_man()
+    var r;
+    if(!snd_Playing())
+        r := file_PlayWAV("sax.wav");
+        snd_Volume(127);
+    else
+        snd_Stop();
+    endif
+
+endfunc

@@ -1,0 +1,1517 @@
+﻿Version     0.0
+Platform    uLCD-43PT-L
+PlatRes     272x480
+Depends
+end
+Options
+    Visualizer
+    Speed                        9600
+    Checksum                     No
+    ResponseSize                 2
+    Multidrop                    No
+    Destination                  0
+    SndBuf                       0
+end
+Form
+    Name                         Form1
+    Bgtype                       Color
+    Color                        BLACK
+    Image                        (None)
+    Source.Height                0
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 0
+    OnActivate                   ''
+    OnCreate                     ''
+    OnRepeat                     ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+LedDigits
+    Name                         dig_speed
+    Color                        BLACK
+    Decimals                     0
+    Digits                       2
+    Height                       148
+    LeadingZero                  No
+    Left                         76
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          44
+    Visible                      Yes
+    Width                        200
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext2
+    AutoSize                     Yes
+    Caption                      kph
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    'Century Gothic'
+    Font.Size                    20
+    Font.Style                   []
+    Height                       33
+    Left                         280
+    Top                          164
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        48
+    WordWrap                     Yes
+end
+Line
+    Name                         Line1
+    Color                        SPRINGGREEN
+    Pattern                      Solid
+    X1                           0
+    X2                           512
+    Y1                           236
+    Y2                           236
+end
+Button
+    Name                         Button1
+    ButtonColor                  RED
+    Caption                      Fuel
+    Color                        YELLOW
+    Font                         FONT1
+    Index                        0
+    Left                         392
+    Outlined                     No
+    OutlineColor                 WHITE
+    Pattern                      Fine
+    State                        Released
+    SelTextBG                    LIME
+    SelTextColor                 BLUE
+    TextHeight                   2
+    TextWidth                    2
+    Top                          60
+    Value                        50
+end
+Button
+    Name                         Button2
+    ButtonColor                  RED
+    Caption                      Temp.
+    Color                        YELLOW
+    Font                         FONT1
+    Index                        0
+    Left                         384
+    Outlined                     No
+    OutlineColor                 WHITE
+    Pattern                      Fine
+    State                        Released
+    SelTextBG                    LIME
+    SelTextColor                 BLUE
+    TextHeight                   2
+    TextWidth                    2
+    Top                          188
+    Value                        50
+end
+Line
+    Name                         Line2
+    Color                        SPRINGGREEN
+    Pattern                      Solid
+    X1                           0
+    X2                           512
+    Y1                           30
+    Y2                           30
+end
+Button
+    Name                         Button3
+    ButtonColor                  RED
+    Caption                      Power
+    Color                        YELLOW
+    Font                         FONT1
+    Index                        0
+    Left                         380
+    Outlined                     No
+    OutlineColor                 WHITE
+    Pattern                      Fine
+    State                        Released
+    SelTextBG                    LIME
+    SelTextColor                 BLUE
+    TextHeight                   2
+    TextWidth                    2
+    Top                          124
+    Value                        50
+end
+Line
+    Name                         Line3
+    Color                        SPRINGGREEN
+    Pattern                      Solid
+    X1                           340
+    X2                           340
+    Y1                           30
+    Y2                           236
+end
+StaticText
+    Name                         Statictext3
+    AutoSize                     Yes
+    Caption                      TRIP:
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    12
+    Font.Style                   []
+    Height                       19
+    Left                         292
+    Top                          8
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        41
+    WordWrap                     Yes
+end
+LedDigits
+    Name                         dig_trip
+    Color                        BLACK
+    Decimals                     1
+    Digits                       4
+    Height                       22
+    LeadingZero                  Yes
+    Left                         344
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          4
+    Visible                      Yes
+    Width                        66
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext4
+    AutoSize                     Yes
+    Caption                      km
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    12
+    Font.Style                   []
+    Height                       19
+    Left                         414
+    Top                          8
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        22
+    WordWrap                     Yes
+end
+Image
+    Name                         Image1
+    Height                       16
+    Image                        arrow_rotate_clockwise.png
+    Left                         448
+    Source.Height                16
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 16
+    Visible                      Yes
+    Top                          8
+    Width                        16
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext5
+    AutoSize                     Yes
+    Caption                      ODO:
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    12
+    Font.Style                   []
+    Height                       19
+    Left                         20
+    Top                          8
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        41
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext6
+    AutoSize                     Yes
+    Caption                      km
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    12
+    Font.Style                   []
+    Height                       19
+    Left                         142
+    Top                          8
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        22
+    WordWrap                     Yes
+end
+Gauge
+    Name                         gauge_speed
+    Analogue                     (None)
+    Bevel.BorderColor            clBtnFace
+    Bevel.BorderWidth            0
+    Bevel.InnerColor             BLACK
+    Bevel.InnerHighlight         clBtnHighlight
+    Bevel.InnerOutline           None
+    Bevel.InnerShadow            clBtnShadow
+    Bevel.InnerSpace             1
+    Bevel.InnerStyle             Lowered
+    Bevel.Innerwidth             2
+    Bevel.OuterColor             clBtnFace
+    Bevel.OuterHighlight         clBtnHighlight
+    Bevel.OuterOutline           Outer
+    Bevel.OuterShadow            clBtnShadow
+    Bevel.OuterSpace             0
+    Bevel.OuterStyle             Raised
+    Bevel.Outerwidth             1
+    Bevel.Visible                Yes
+    Color                        BLACK
+    Height                       26
+    Interval                     100
+    Left                         12
+    Maxvalue                     100
+    Minvalue                     0
+    Orientation                  Horizontal
+    Palette1.High                clLime
+    Palette1.Low                 0x005100
+    Palette2.High                clYellow
+    Palette2.Low                 0x005151
+    Palette3.High                clRed
+    Palette3.Low                 0x000051
+    Percent1                     25
+    Percent2                     50
+    Spacing                      1
+    Step                         10
+    Style                        BottomLeft
+    TickHeight                   1
+    Timer                        (None)
+    Top                          207
+    Visible                      Yes
+    Width                        319
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+LedDigits
+    Name                         dig_odo
+    Color                        BLACK
+    Decimals                     0
+    Digits                       4
+    Height                       22
+    LeadingZero                  Yes
+    Left                         72
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          4
+    Visible                      Yes
+    Width                        66
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Image
+    Name                         Image2
+    Height                       24
+    Image                        battery.png
+    Left                         352
+    Source.Height                24
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 24
+    Visible                      Yes
+    Top                          124
+    Width                        24
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Image
+    Name                         Image3
+    Height                       24
+    Image                        gas.png
+    Left                         360
+    Source.Height                24
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 24
+    Visible                      Yes
+    Top                          60
+    Width                        24
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Image
+    Name                         Image4
+    Height                       24
+    Image                        temp.png
+    Left                         356
+    Source.Height                24
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 24
+    Visible                      Yes
+    Top                          188
+    Width                        24
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Image
+    Name                         Image5
+    Height                       51
+    Image                        forward.png
+    Left                         16
+    Source.Height                389
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 300
+    Visible                      Yes
+    Top                          40
+    Width                        37
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Image
+    Name                         Image6
+    Height                       51
+    Image                        rev.png
+    Left                         17
+    Source.Height                384
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 300
+    Visible                      Yes
+    Top                          96
+    Width                        35
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Image
+    Name                         Image7
+    Height                       37
+    Image                        cc_on.png
+    Left                         12
+    Source.Height                37
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 45
+    Visible                      Yes
+    Top                          160
+    Width                        45
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Rectangle
+    Name                         Rectangle1
+    Color                        0x000002
+    Filled                       Yes
+    Height                       51
+    Left                         6
+    Outlined                     No
+    OutlineColor                 BLACK
+    Pattern                      Fine
+    Top                          151
+    Width                        54
+end
+Rectangle
+    Name                         Rectangle2
+    Color                        0x000002
+    Filled                       Yes
+    Height                       111
+    Left                         8
+    Outlined                     No
+    OutlineColor                 BLACK
+    Pattern                      Fine
+    Top                          36
+    Width                        54
+end
+Image
+    Name                         Image8
+    Height                       32
+    Image                        1362468060_saxophone.png
+    Left                         4
+    Source.Height                26
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 26
+    Visible                      Yes
+    Top                          242
+    Width                        32
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Form
+    Name                         Form2
+    Bgtype                       Color
+    Color                        BLACK
+    Image                        (None)
+    Source.Height                0
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 0
+    OnActivate                   ''
+    OnCreate                     ''
+    OnRepeat                     ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Thermometer
+    Name                         temp_outside
+    Caption                      Outside
+    Color                        BLACK
+    ColorAfter                   0x000051
+    ColorBefore                  clRed
+    Direction                    Vertical
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Arial
+    Font.Size                    10
+    Font.Style                   []
+    Height                       215
+    Left                         0
+    Scale.Color                  WHITE
+    Scale.Decimals               0
+    Scale.Heightmax              14
+    Scale.Heightmin              8
+    Scale.Max                    40
+    Scale.Min                    -30
+    Scale.Offset                 20
+    Scale.Position               After
+    Scale.ScaleType              Linear
+    Scale.SmallStep              5
+    Scale.Step                   10
+    Scale.Visible                Yes
+    Setpoint.Bitmap              (None)
+    Setpoint.Color               BLUE
+    Setpoint.Shape               Line
+    Setpoint.Value               33
+    Setpoint.Visible             No
+    ShowCaption                  Yes
+    Top                          32
+    Value.Bitmap                 (None)
+    Value.Color                  clAqua
+    Value.Shape                  Line
+    Value.Value                  100
+    Value.Visible                Yes
+    Visible                      Yes
+    Width                        90
+    OnChanged                    ''
+end
+Button
+    Name                         Button4
+    ButtonColor                  RED
+    Caption                      '< Back'
+    Color                        YELLOW
+    Font                         FONT1
+    Index                        0
+    Left                         372
+    Outlined                     No
+    OutlineColor                 WHITE
+    Pattern                      Fine
+    State                        Released
+    SelTextBG                    LIME
+    SelTextColor                 BLUE
+    TextHeight                   2
+    TextWidth                    2
+    Top                          236
+    Value                        50
+end
+Thermometer
+    Name                         temp_cabin
+    Caption                      Cabin
+    Color                        BLACK
+    ColorAfter                   0x000051
+    ColorBefore                  clRed
+    Direction                    Vertical
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Arial
+    Font.Size                    10
+    Font.Style                   []
+    Height                       215
+    Left                         88
+    Scale.Color                  WHITE
+    Scale.Decimals               0
+    Scale.Heightmax              14
+    Scale.Heightmin              8
+    Scale.Max                    40
+    Scale.Min                    -30
+    Scale.Offset                 20
+    Scale.Position               After
+    Scale.ScaleType              Linear
+    Scale.SmallStep              5
+    Scale.Step                   10
+    Scale.Visible                Yes
+    Setpoint.Bitmap              (None)
+    Setpoint.Color               BLUE
+    Setpoint.Shape               Line
+    Setpoint.Value               33
+    Setpoint.Visible             No
+    ShowCaption                  Yes
+    Top                          30
+    Value.Bitmap                 (None)
+    Value.Color                  clAqua
+    Value.Shape                  Line
+    Value.Value                  100
+    Value.Visible                Yes
+    Visible                      Yes
+    Width                        90
+    OnChanged                    ''
+end
+Thermometer
+    Name                         temp_trunk
+    Caption                      Trunk
+    Color                        BLACK
+    ColorAfter                   0x000051
+    ColorBefore                  clRed
+    Direction                    Vertical
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Arial
+    Font.Size                    10
+    Font.Style                   []
+    Height                       215
+    Left                         180
+    Scale.Color                  WHITE
+    Scale.Decimals               0
+    Scale.Heightmax              14
+    Scale.Heightmin              8
+    Scale.Max                    40
+    Scale.Min                    -30
+    Scale.Offset                 20
+    Scale.Position               After
+    Scale.ScaleType              Linear
+    Scale.SmallStep              5
+    Scale.Step                   10
+    Scale.Visible                Yes
+    Setpoint.Bitmap              (None)
+    Setpoint.Color               BLUE
+    Setpoint.Shape               Line
+    Setpoint.Value               33
+    Setpoint.Visible             No
+    ShowCaption                  Yes
+    Top                          30
+    Value.Bitmap                 (None)
+    Value.Color                  clAqua
+    Value.Shape                  Line
+    Value.Value                  100
+    Value.Visible                Yes
+    Visible                      Yes
+    Width                        90
+    OnChanged                    ''
+end
+Thermometer
+    Name                         temp_fuelcell
+    Caption                      'Fuel Cell'
+    Color                        BLACK
+    ColorAfter                   0x000051
+    ColorBefore                  clRed
+    Direction                    Vertical
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Arial
+    Font.Size                    10
+    Font.Style                   []
+    Height                       215
+    Left                         270
+    Scale.Color                  WHITE
+    Scale.Decimals               0
+    Scale.Heightmax              14
+    Scale.Heightmin              8
+    Scale.Max                    70
+    Scale.Min                    0
+    Scale.Offset                 20
+    Scale.Position               After
+    Scale.ScaleType              Linear
+    Scale.SmallStep              5
+    Scale.Step                   10
+    Scale.Visible                Yes
+    Setpoint.Bitmap              (None)
+    Setpoint.Color               BLUE
+    Setpoint.Shape               Line
+    Setpoint.Value               33
+    Setpoint.Visible             No
+    ShowCaption                  Yes
+    Top                          30
+    Value.Bitmap                 (None)
+    Value.Color                  clAqua
+    Value.Shape                  Line
+    Value.Value                  100
+    Value.Visible                Yes
+    Visible                      Yes
+    Width                        90
+    OnChanged                    ''
+end
+StaticText
+    Name                         Statictext1
+    AutoSize                     Yes
+    Caption                      'TEMPERATURE MENU'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 [Underline]
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       14
+    Left                         184
+    Top                          4
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        119
+    WordWrap                     Yes
+end
+Form
+    Name                         Form3
+    Bgtype                       Color
+    Color                        BLACK
+    Image                        (None)
+    Source.Height                0
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 0
+    OnActivate                   ''
+    OnCreate                     ''
+    OnRepeat                     ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext7
+    AutoSize                     Yes
+    Caption                      'POWER MENU'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 [Underline]
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       14
+    Left                         192
+    Top                          12
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        78
+    WordWrap                     Yes
+end
+Button
+    Name                         Button5
+    ButtonColor                  RED
+    Caption                      '< Back'
+    Color                        YELLOW
+    Font                         FONT1
+    Index                        0
+    Left                         372
+    Outlined                     No
+    OutlineColor                 WHITE
+    Pattern                      Fine
+    State                        Released
+    SelTextBG                    LIME
+    SelTextColor                 BLUE
+    TextHeight                   2
+    TextWidth                    2
+    Top                          236
+    Value                        50
+end
+Gauge
+    Name                         barStackV
+    Analogue                     (None)
+    Bevel.BorderColor            clBtnFace
+    Bevel.BorderWidth            0
+    Bevel.InnerColor             BLACK
+    Bevel.InnerHighlight         clBtnHighlight
+    Bevel.InnerOutline           None
+    Bevel.InnerShadow            clBtnShadow
+    Bevel.InnerSpace             1
+    Bevel.InnerStyle             Lowered
+    Bevel.Innerwidth             2
+    Bevel.OuterColor             clBtnFace
+    Bevel.OuterHighlight         clBtnHighlight
+    Bevel.OuterOutline           Outer
+    Bevel.OuterShadow            clBtnShadow
+    Bevel.OuterSpace             0
+    Bevel.OuterStyle             Raised
+    Bevel.Outerwidth             1
+    Bevel.Visible                Yes
+    Color                        BLACK
+    Height                       17
+    Interval                     100
+    Left                         240
+    Maxvalue                     100
+    Minvalue                     0
+    Orientation                  Horizontal
+    Palette1.High                RED
+    Palette1.Low                 0x000051
+    Palette2.High                LIME
+    Palette2.Low                 0x005151
+    Palette3.High                clRed
+    Palette3.Low                 0x000051
+    Percent1                     40
+    Percent2                     55
+    Spacing                      1
+    Step                         10
+    Style                        BottomLeft
+    TickHeight                   1
+    Timer                        (None)
+    Top                          48
+    Visible                      Yes
+    Width                        229
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext8
+    AutoSize                     Yes
+    Caption                      'Stack Voltage:'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       16
+    Left                         64
+    Top                          48
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        84
+    WordWrap                     Yes
+end
+LedDigits
+    Name                         digStackV
+    Color                        BLACK
+    Decimals                     1
+    Digits                       3
+    Height                       23
+    LeadingZero                  Yes
+    Left                         160
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          44
+    Visible                      Yes
+    Width                        49
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext9
+    AutoSize                     Yes
+    Caption                      'Accessory Voltage:'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       14
+    Left                         40
+    Top                          76
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        104
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext10
+    AutoSize                     Yes
+    Caption                      V
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    14
+    Font.Style                   []
+    Height                       23
+    Left                         212
+    Top                          44
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        11
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext11
+    AutoSize                     Yes
+    Caption                      'Boost Conv. Voltage:'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       28
+    Left                         28
+    Top                          104
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        121
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext12
+    AutoSize                     Yes
+    Caption                      'Motor Current 1:'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       14
+    Left                         52
+    Top                          160
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        92
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext13
+    AutoSize                     Yes
+    Caption                      'Motor Current 2:'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       14
+    Left                         52
+    Top                          188
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        92
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext16
+    AutoSize                     Yes
+    Caption                      'Stack Current:'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       14
+    Left                         64
+    Top                          132
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        79
+    WordWrap                     Yes
+end
+Gauge
+    Name                         barAccV
+    Analogue                     (None)
+    Bevel.BorderColor            clBtnFace
+    Bevel.BorderWidth            0
+    Bevel.InnerColor             BLACK
+    Bevel.InnerHighlight         clBtnHighlight
+    Bevel.InnerOutline           None
+    Bevel.InnerShadow            clBtnShadow
+    Bevel.InnerSpace             1
+    Bevel.InnerStyle             Lowered
+    Bevel.Innerwidth             2
+    Bevel.OuterColor             clBtnFace
+    Bevel.OuterHighlight         clBtnHighlight
+    Bevel.OuterOutline           Outer
+    Bevel.OuterShadow            clBtnShadow
+    Bevel.OuterSpace             0
+    Bevel.OuterStyle             Raised
+    Bevel.Outerwidth             1
+    Bevel.Visible                Yes
+    Color                        BLACK
+    Height                       17
+    Interval                     100
+    Left                         240
+    Maxvalue                     100
+    Minvalue                     0
+    Orientation                  Horizontal
+    Palette1.High                RED
+    Palette1.Low                 0x000051
+    Palette2.High                LIME
+    Palette2.Low                 0x005151
+    Palette3.High                clRed
+    Palette3.Low                 0x000051
+    Percent1                     70
+    Percent2                     20
+    Spacing                      1
+    Step                         10
+    Style                        BottomLeft
+    TickHeight                   1
+    Timer                        (None)
+    Top                          76
+    Visible                      Yes
+    Width                        229
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Led
+    Name                         ledFuelCellPwr
+    Caption                      'Fuel Cell Power'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Glyphs                       (None)
+    Height                       20
+    Layout                       Left
+    LedType                      LargeRect
+    Left                         28
+    Palette.High                 YELLOW
+    Palette.Low                  0x000051
+    Spacing                      5
+    Top                          244
+    Visible                      Yes
+    Width                        117
+    OnChanged                    ''
+end
+Led
+    Name                         ledMotorPwr
+    Caption                      'Motor Power'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Glyphs                       (None)
+    Height                       20
+    Layout                       Left
+    LedType                      LargeRect
+    Left                         156
+    Palette.High                 YELLOW
+    Palette.Low                  0x000051
+    Spacing                      5
+    Top                          244
+    Visible                      Yes
+    Width                        117
+    OnChanged                    ''
+end
+LedDigits
+    Name                         digAccV
+    Color                        BLACK
+    Decimals                     1
+    Digits                       3
+    Height                       23
+    LeadingZero                  Yes
+    Left                         160
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          72
+    Visible                      Yes
+    Width                        49
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext14
+    AutoSize                     Yes
+    Caption                      V
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    14
+    Font.Style                   []
+    Height                       23
+    Left                         212
+    Top                          72
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        11
+    WordWrap                     Yes
+end
+LedDigits
+    Name                         digBuckBoostV
+    Color                        BLACK
+    Decimals                     1
+    Digits                       3
+    Height                       23
+    LeadingZero                  Yes
+    Left                         160
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          100
+    Visible                      Yes
+    Width                        49
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+LedDigits
+    Name                         digStackI
+    Color                        BLACK
+    Decimals                     1
+    Digits                       3
+    Height                       23
+    LeadingZero                  Yes
+    Left                         160
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          128
+    Visible                      Yes
+    Width                        49
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+LedDigits
+    Name                         digMotCurr1
+    Color                        BLACK
+    Decimals                     1
+    Digits                       3
+    Height                       23
+    LeadingZero                  Yes
+    Left                         160
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          156
+    Visible                      Yes
+    Width                        49
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+LedDigits
+    Name                         digMotCurr2
+    Color                        BLACK
+    Decimals                     1
+    Digits                       3
+    Height                       23
+    LeadingZero                  Yes
+    Left                         160
+    OutlineColor                 BLACK
+    Palette.High                 clLime
+    Palette.Low                  BLACK
+    Top                          184
+    Visible                      Yes
+    Width                        49
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext15
+    AutoSize                     Yes
+    Caption                      V
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    14
+    Font.Style                   []
+    Height                       21
+    Left                         212
+    Top                          99
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        18
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext17
+    AutoSize                     Yes
+    Caption                      A
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    14
+    Font.Style                   []
+    Height                       23
+    Left                         212
+    Top                          128
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        11
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext18
+    AutoSize                     Yes
+    Caption                      A
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    14
+    Font.Style                   []
+    Height                       23
+    Left                         212
+    Top                          154
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        11
+    WordWrap                     Yes
+end
+StaticText
+    Name                         Statictext19
+    AutoSize                     Yes
+    Caption                      A
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    14
+    Font.Style                   []
+    Height                       23
+    Left                         212
+    Top                          184
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        11
+    WordWrap                     Yes
+end
+Gauge
+    Name                         barBuckBoostV
+    Analogue                     (None)
+    Bevel.BorderColor            clBtnFace
+    Bevel.BorderWidth            0
+    Bevel.InnerColor             BLACK
+    Bevel.InnerHighlight         clBtnHighlight
+    Bevel.InnerOutline           None
+    Bevel.InnerShadow            clBtnShadow
+    Bevel.InnerSpace             1
+    Bevel.InnerStyle             Lowered
+    Bevel.Innerwidth             2
+    Bevel.OuterColor             clBtnFace
+    Bevel.OuterHighlight         clBtnHighlight
+    Bevel.OuterOutline           Outer
+    Bevel.OuterShadow            clBtnShadow
+    Bevel.OuterSpace             0
+    Bevel.OuterStyle             Raised
+    Bevel.Outerwidth             1
+    Bevel.Visible                Yes
+    Color                        BLACK
+    Height                       17
+    Interval                     100
+    Left                         240
+    Maxvalue                     100
+    Minvalue                     0
+    Orientation                  Horizontal
+    Palette1.High                RED
+    Palette1.Low                 0x000051
+    Palette2.High                LIME
+    Palette2.Low                 0x005151
+    Palette3.High                clRed
+    Palette3.Low                 0x000051
+    Percent1                     70
+    Percent2                     20
+    Spacing                      1
+    Step                         10
+    Style                        BottomLeft
+    TickHeight                   1
+    Timer                        (None)
+    Top                          104
+    Visible                      Yes
+    Width                        229
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Gauge
+    Name                         barStackI
+    Analogue                     (None)
+    Bevel.BorderColor            clBtnFace
+    Bevel.BorderWidth            0
+    Bevel.InnerColor             BLACK
+    Bevel.InnerHighlight         clBtnHighlight
+    Bevel.InnerOutline           None
+    Bevel.InnerShadow            clBtnShadow
+    Bevel.InnerSpace             1
+    Bevel.InnerStyle             Lowered
+    Bevel.Innerwidth             2
+    Bevel.OuterColor             clBtnFace
+    Bevel.OuterHighlight         clBtnHighlight
+    Bevel.OuterOutline           Outer
+    Bevel.OuterShadow            clBtnShadow
+    Bevel.OuterSpace             0
+    Bevel.OuterStyle             Raised
+    Bevel.Outerwidth             1
+    Bevel.Visible                Yes
+    Color                        BLACK
+    Height                       17
+    Interval                     100
+    Left                         240
+    Maxvalue                     100
+    Minvalue                     0
+    Orientation                  Horizontal
+    Palette1.High                RED
+    Palette1.Low                 0x000051
+    Palette2.High                LIME
+    Palette2.Low                 0x005151
+    Palette3.High                clRed
+    Palette3.Low                 0x000051
+    Percent1                     20
+    Percent2                     55
+    Spacing                      1
+    Step                         10
+    Style                        BottomLeft
+    TickHeight                   1
+    Timer                        (None)
+    Top                          132
+    Visible                      Yes
+    Width                        229
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Gauge
+    Name                         barMotCurr1
+    Analogue                     (None)
+    Bevel.BorderColor            clBtnFace
+    Bevel.BorderWidth            0
+    Bevel.InnerColor             BLACK
+    Bevel.InnerHighlight         clBtnHighlight
+    Bevel.InnerOutline           None
+    Bevel.InnerShadow            clBtnShadow
+    Bevel.InnerSpace             1
+    Bevel.InnerStyle             Lowered
+    Bevel.Innerwidth             2
+    Bevel.OuterColor             clBtnFace
+    Bevel.OuterHighlight         clBtnHighlight
+    Bevel.OuterOutline           Outer
+    Bevel.OuterShadow            clBtnShadow
+    Bevel.OuterSpace             0
+    Bevel.OuterStyle             Raised
+    Bevel.Outerwidth             1
+    Bevel.Visible                Yes
+    Color                        BLACK
+    Height                       17
+    Interval                     100
+    Left                         240
+    Maxvalue                     100
+    Minvalue                     0
+    Orientation                  Horizontal
+    Palette1.High                RED
+    Palette1.Low                 0x000051
+    Palette2.High                LIME
+    Palette2.Low                 0x005151
+    Palette3.High                clRed
+    Palette3.Low                 0x000051
+    Percent1                     0
+    Percent2                     90
+    Spacing                      1
+    Step                         10
+    Style                        BottomLeft
+    TickHeight                   1
+    Timer                        (None)
+    Top                          160
+    Visible                      Yes
+    Width                        229
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Gauge
+    Name                         barMotCurr2
+    Analogue                     (None)
+    Bevel.BorderColor            clBtnFace
+    Bevel.BorderWidth            0
+    Bevel.InnerColor             BLACK
+    Bevel.InnerHighlight         clBtnHighlight
+    Bevel.InnerOutline           None
+    Bevel.InnerShadow            clBtnShadow
+    Bevel.InnerSpace             1
+    Bevel.InnerStyle             Lowered
+    Bevel.Innerwidth             2
+    Bevel.OuterColor             clBtnFace
+    Bevel.OuterHighlight         clBtnHighlight
+    Bevel.OuterOutline           Outer
+    Bevel.OuterShadow            clBtnShadow
+    Bevel.OuterSpace             0
+    Bevel.OuterStyle             Raised
+    Bevel.Outerwidth             1
+    Bevel.Visible                Yes
+    Color                        BLACK
+    Height                       17
+    Interval                     100
+    Left                         240
+    Maxvalue                     100
+    Minvalue                     0
+    Orientation                  Horizontal
+    Palette1.High                RED
+    Palette1.Low                 0x000051
+    Palette2.High                LIME
+    Palette2.Low                 0x005151
+    Palette3.High                clRed
+    Palette3.Low                 0x000051
+    Percent1                     0
+    Percent2                     90
+    Spacing                      1
+    Step                         10
+    Style                        BottomLeft
+    TickHeight                   1
+    Timer                        (None)
+    Top                          188
+    Visible                      Yes
+    Width                        229
+    OnChanged                    ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+Form
+    Name                         Form4
+    Bgtype                       Color
+    Color                        BLACK
+    Image                        (None)
+    Source.Height                0
+    Source.Left                  0
+    Source.Top                   0
+    Source.Width                 0
+    OnActivate                   ''
+    OnCreate                     ''
+    OnRepeat                     ''
+    OnTouchMoving                ''
+    OnTouchPressed               ''
+    OnTouchReleased              ''
+end
+StaticText
+    Name                         Statictext20
+    AutoSize                     Yes
+    Caption                      'FUEL MENU'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 [Underline]
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       14
+    Left                         196
+    Top                          8
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        63
+    WordWrap                     Yes
+end
+AngularMeter
+    Name                         Angularmeter1
+    Analogue                     (None)
+    Angle                        40
+    AngleOffset                  280
+    Caption                      ''
+    CaptionXOffset               0
+    CaptionYOffset               0
+    CenterDotColor               clWhite
+    CenterDotWidth               2
+    Color                        BLACK
+    ColorZone1                   RED
+    ColorZone2                   GREEN
+    ColorZone3                   RED
+    Decimals                     0
+    Font.Color                   clWhite
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    8
+    Font.Style                   []
+    Height                       211
+    Labels                       10
+    LabelsFont.Color             clWhite
+    LabelsFont.Effects           []
+    LabelsFont.Name              Tahoma
+    LabelsFont.Size              8
+    LabelsFont.Style             []
+    LabelsOffset                 30
+    Left                         12
+    Maxvalue                     2200
+    Minvalue                     0
+    NeedleBasewidth              7
+    NeedleColor                  clRed
+    NeedleLength                 -1
+    Percent1                     8
+    Percent2                     85
+    Radius                       -1
+    Spacing                      40
+    Ticks                        100
+    TicksColor                   clWhite
+    TicksEnlarge                 10
+    TicksMax                     15
+    TicksMin                     6
+    Timer                        (None)
+    Top                          24
+    Visible                      Yes
+    Width                        439
+    OnChanged                    ''
+end
+StaticText
+    Name                         Statictext21
+    AutoSize                     Yes
+    Caption                      'H2 Tank Pressure (psi)'
+    Color                        BLACK
+    Font.Color                   WHITE
+    Font.Effects                 []
+    Font.Name                    Tahoma
+    Font.Size                    9
+    Font.Style                   []
+    Height                       18
+    Left                         168
+    Top                          220
+    Transparent                  Yes
+    Visible                      Yes
+    Width                        127
+    WordWrap                     Yes
+end
+Button
+    Name                         Button6
+    ButtonColor                  RED
+    Caption                      '< Back'
+    Color                        YELLOW
+    Font                         FONT1
+    Index                        0
+    Left                         372
+    Outlined                     No
+    OutlineColor                 WHITE
+    Pattern                      Fine
+    State                        Released
+    SelTextBG                    LIME
+    SelTextColor                 BLUE
+    TextHeight                   2
+    TextWidth                    2
+    Top                          236
+    Value                        50
+end
