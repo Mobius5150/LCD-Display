@@ -8,6 +8,7 @@
 
 var combuf[3];
 var tmpbuf[3];
+var bufFill := 0;
 var n, ch;
 
 
@@ -137,7 +138,6 @@ func update_odo()
         // Save new speed data.
         sys_SetTimer(TIMER1, 1000);
         pokeW(SYSTEM_TIMER_LO, 0);  // Reset speed timer.
-
     endfunc
 
 
@@ -402,45 +402,15 @@ func clearErrors()
 endfunc
 
 func serial_read()
-start_serial:
-    com_Init(combuf, 3, 0xFF );
-    pin_HI(PIN_LCDOUT); // Signal to PIC that we are listening
-
-    setbaud(BAUD_57600);
-
-    repeat
-    until(com_Full());
-
-    n := com_Count();
-    while(n--)
-        if( (ch := serin()) < -1)
-            print([DEC] ch);
-            com_Reset();
-            goto start_serial;
-        else if(ch == -1)
-             print([DEC] ch);
+    ch := serin();
+    if ( ch >= 0 )
+        tmpbuf[bufFill] := ch;
+        bufFill++;
+        if ( bufFill == 3 )
+             bufFill := 0;
+             process_serial_data(tmpbuf[0], tmpbuf[1], tmpbuf[2]);
         endif
-        tmpbuf[2-n] := ch;
-    wend
-
-    pin_LO(PIN_LCDOUT); // No longer listening.
-
-
-    com_Reset();
-
-    // Process data.
-    process_serial_data(tmpbuf[0], tmpbuf[1], tmpbuf[2]);
-
-    // Check for touch events.
-    checkTouchEvents();
-
-    // Check the status of the PIC pin. Either keep listening, or
-    // draw the form and return back to the main routine.
-
-    if (pin_Read(PIN_PICIN))
-        //goto start_serial;
     endif
-
 endfunc
 
 func draw_form4()
@@ -747,24 +717,22 @@ func main()
     pokeW(SYSTEM_TIMER_LO, 0);
     sys_SetTimer(TIMER1, 10);
 
-
+    com_Init( combuf, 3, 0 );
+    setbaud(BAUD_57600);
 
     if(snd_Playing())
         snd_Stop();
     endif
 
      repeat
-        if(pin_Read(PIN_PICIN))
-            serial_read();
-        endif
-
+        serial_read();
         checkTouchEvents();
     forever
 
 endfunc
 
 func checkTouchEvents()
-if(touch_Get(TOUCH_STATUS) == TOUCH_PRESSED)
+    if(touch_Get(TOUCH_STATUS) == TOUCH_PRESSED)
             // Query the x and y coordinates of where we touched.
             var x;
             var y;

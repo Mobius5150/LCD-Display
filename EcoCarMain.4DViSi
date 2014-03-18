@@ -976,6 +976,7 @@ Gauge
 end
 Led
     Name                         ledFuelCellPwr
+    Active                       No
     Caption                      'Fuel Cell Power'
     Color                        BLACK
     Font.Color                   WHITE
@@ -998,6 +999,7 @@ Led
 end
 Led
     Name                         ledMotorPwr
+    Active                       No
     Caption                      'Motor Power'
     Color                        BLACK
     Font.Color                   WHITE
