@@ -157,7 +157,7 @@ func process_serial_data(var type, var databyte1, var databyte2)
         // Fuel cell temperature
         if(activeForm == 2 && temp_fuelcell != databyte2)
             // Top end is 70 deg. C
-            img_SetWord(hndl, itemp_fuelcell, IMAGE_INDEX, databyte2/2);
+            img_SetWord(hndl, itemp_fuelcell, IMAGE_INDEX, dataword / 1000);
             img_Show(hndl, itemp_fuelcell);
         endif
 
@@ -255,21 +255,21 @@ func process_serial_data(var type, var databyte1, var databyte2)
      else if(type == 0xC0)
         // Trunk temperature
         if(activeForm == 2 && temp_trunk != databyte2)
-            img_SetWord(hndl, itemp_trunk, IMAGE_INDEX, databyte2);
+            img_SetWord(hndl, itemp_trunk, IMAGE_INDEX, dataword / 1000 + 30);
             img_Show(hndl, itemp_trunk);
         endif
         temp_trunk := databyte2;
      else if(type == 0xC1)
         // Cabin temperature
         if(activeForm == 2 && temp_cabin != databyte2)
-            img_SetWord(hndl, itemp_cabin, IMAGE_INDEX, databyte2);
+            img_SetWord(hndl, itemp_cabin, IMAGE_INDEX, dataword / 1000 + 30);
             img_Show(hndl, itemp_cabin);
         endif
         temp_cabin := databyte2;
      else if(type == 0xC2)
         // Outside temperature
         if(activeForm == 2 && temp_outside != databyte2)
-            img_SetWord(hndl, itemp_outside, IMAGE_INDEX, databyte2/2 + 30);
+            img_SetWord(hndl, itemp_outside, IMAGE_INDEX, dataword / 1000 + 30);
             img_Show(hndl, itemp_outside);
         endif
         temp_outside := databyte2;
